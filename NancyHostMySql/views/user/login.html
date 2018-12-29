@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/Content/bootstrap/css/bootstrap.css" />
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" placeholder="Username" />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Password" />
+        </div>
+        <button class="btn btn-primary" id="submit">Let's go</button>
+        <div id="noLogin" style="display: none;" class="alert alert-danger" role="alert">Invalid Login information!</div>
+        <div id="loginOk" style="display: none;" class="alert alert-success" role="alert">OK!</div>
+
+    </div>
+
+    <script type="text/javascript" src="~/Content/Cookie/js.cookie.js"></script>
+    <script type="text/javascript" src="~/Content/jquery/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="~/Content/bootstrap/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#noLogin').hide();
+
+            var successReturn = function (data) {
+                $('#noLogin').hide();
+                $('#loginOk').show();
+            };
+
+            var errorReturn = function () {
+                $('#noLogin').show();
+                $('#loginOk').hide();
+            };
+
+            function sendForm() {
+                var information = {
+                    Name: $('#username').val(),
+                    Password: $('#password').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/user',
+                    data: information,
+                    //success: successReturn,
+                    //error: errorReturn,
+                    dataType: 'json',
+                    statusCode: {
+                        200: function (response) {
+                            successReturn();
+                            console.log(response);
+                            Cookies.set("apiKey", response.apiKey);
+                            window.location.replace(response.redirect);
+                        },
+                        401: function () {
+                            errorReturn();
+                        }
+                    }
+                });
+            };
+
+            $('#submit').click(function () {
+                sendForm();
+            });
+        });
+
+    </script>
+
+</body>
+</html>
